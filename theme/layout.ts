@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 
-export const Layout = {
+export const layout = {
   borderRadius: {
     s: 4,
     m: 8,
@@ -30,4 +30,4 @@ export const Layout = {
   },
 };
 
-export default Layout;
+export default layout;

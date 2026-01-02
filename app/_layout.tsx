@@ -9,7 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
-  const { userToken, userType, isLoading } = useAuth();
+  const { userToken, userType, isLoading, hasSeenOnboarding } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
@@ -24,7 +24,11 @@ function RootLayoutNav() {
       // If not signed in, redirect to auth group if not already there
       // We also check against the root index to avoid loops or stuck states
       if (!inAuthGroup) {
-        router.replace('/(auth)/login');
+        if (!hasSeenOnboarding) {
+           router.replace('/(auth)/onboarding');
+        } else {
+           router.replace('/(auth)/login');
+        }
       }
     } else {
       // If signed in, redirect based on user type
