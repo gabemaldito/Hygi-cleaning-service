@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
-type UserType = 'client' | 'professional' | null;
+type UserType = "client" | "professional" | null;
 
 interface AuthContextType {
   userToken: string | null;
@@ -8,8 +9,8 @@ interface AuthContextType {
   isLoading: boolean;
   hasSeenOnboarding: boolean;
   completeOnboarding: () => void;
-  signIn: (token: string, type: UserType) => void;
-  signOut: () => void;
+  signIn: (token: string, type: UserType) => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -17,9 +18,9 @@ const AuthContext = createContext<AuthContextType>({
   userType: null,
   isLoading: true,
   hasSeenOnboarding: false,
-  completeOnboarding: () => {},
-  signIn: () => {},
-  signOut: () => {},
+  completeOnboarding: async () => {},
+  signIn: async () => {},
+  signOut: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -31,27 +32,53 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate checking storage for credentials
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
+    const loadStorageData = async () => {
+      try {
+        const savedToken = await AsyncStorage.getItem("userToken");
+        const savedType = await AsyncStorage.getItem("userType");
+        const savedOnboarding = await AsyncStorage.getItem("hasSeenOnboarding");
+
+        if (savedToken && savedType) {
+          setUserToken(savedToken);
+          setUserType(savedType as UserType);
+        }
+
+        if (savedOnboarding === "true") {
+          setHasSeenOnboarding(true);
+        }
+      } catch (e) {
+        console.error("Erro ao carregar storage", e);
+      } finally {
+        setIsLoading(false); // Para o loading screen do index.tsx
+      }
+    };
+    loadStorageData();
   }, []);
 
-  const completeOnboarding = () => {
+  const completeOnboarding = async () => {
     setHasSeenOnboarding(true);
+    await AsyncStorage.setItem("hasSeenOnboarding", "true");
   };
 
-  const signIn = (token: string, type: UserType) => {
-    setUserToken(token);
-    setUserType(type);
+  const signIn = async (token: string, type: UserType) => {
+    try {
+      setUserToken(token);
+      setUserType(type);
+      await AsyncStorage.setItem("userToken", token);
+      await AsyncStorage.setItem("userType", type as string);
+    } catch (e) {
+      console.error("Error saving credentials:", e);
+    }
   };
 
-  const signOut = () => {
-    setUserToken(null);
-    setUserType(null);
-    setHasSeenOnboarding(false); // Optional: reset onboarding on sign out? Usually no, but for dev maybe. Let's keep it true normally.
-    // Actually for logic consistency, simple sign out shouldn't un-see onboarding.
-    // But if we want to test again, we reload the app.
+  const signOut = async () => {
+    try {
+      setUserToken(null);
+      setUserType(null);
+      await AsyncStorage.multiRemove(["userToken", "userType"]);
+    } catch (e) {
+      console.error("Error clearing storage:", e);
+    }
   };
 
   return (

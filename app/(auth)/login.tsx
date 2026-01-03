@@ -4,13 +4,14 @@ import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "@/context/AuthContext";
 import Colors from "@/theme/colors";
@@ -41,7 +42,11 @@ export default function LoginScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
-        <View style={styles.container}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           {/* Header Section */}
           <View style={styles.header}>
             <View style={styles.logoPlaceholder}>
@@ -153,7 +158,7 @@ export default function LoginScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -167,14 +172,15 @@ const styles = StyleSheet.create({
   keyboardView: {
     flex: 1,
   },
-  container: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: spacing.l,
-    justifyContent: "center",
+    justifyContent: "center", // Garante centralização vertical
+    paddingVertical: spacing.l,
   },
   header: {
     alignItems: "center",
-    marginBottom: spacing.xl,
+    marginBottom: spacing.l, // Reduzi de 60 para evitar overflow
   },
   logoPlaceholder: {
     width: 60,
@@ -184,6 +190,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: spacing.m,
+    // Removi o marginTop excessivo que empurrava o conteúdo pra fora
     shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -280,6 +287,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     gap: spacing.l,
+    marginBottom: spacing.l,
   },
   socialButton: {
     width: 56,
@@ -297,10 +305,11 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   spacer: {
-    flex: 1, // Push content down
+    flex: 1,
+    minHeight: 20,
   },
   createAccountContainer: {
-    marginTop: spacing.xl,
+    marginTop: spacing.m,
     marginBottom: spacing.l,
     alignItems: "center",
     backgroundColor: Colors.surface,
