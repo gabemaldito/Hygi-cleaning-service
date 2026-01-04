@@ -1,5 +1,5 @@
 import { AntDesign, Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -20,16 +20,21 @@ import { typography } from "@/theme/typography";
 
 export default function LoginScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams();
   const { signIn } = useAuth();
+
+  // The type of user we are logging in as (defaulted or from onboarding)
+  const [userType, setUserType] = useState<"client" | "professional">(
+    (params.type as any) || "client"
+  );
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordVisible, setPasswordVisible] = useState(false);
 
   const handleLogin = () => {
-    // Tipically, the backend returns the user type.
-    // We'll default to 'client' for this demo since the UI doesn't ask anymore.
-    signIn("dummy-token", "client");
+    // In a real app, the backend would tell us the user type or we verify against what's selected.
+    signIn("dummy-token", userType);
   };
 
   const handleSocialLogin = (provider: string) => {

@@ -1,3 +1,4 @@
+import { Feather } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import { router } from "expo-router";
@@ -68,24 +69,29 @@ const Slide = ({ item }: { item: (typeof SLIDES)[0] }) => {
 
 export default function OnboardingScreen() {
   const { completeOnboarding } = useAuth();
+  const [showRoleSelection, setShowRoleSelection] = useState(false);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const flatListRef = useRef<FlatList>(null);
 
-  const finishOnboarding = async () => {
+  const finishOnboarding = async (type: "client" | "professional") => {
     await completeOnboarding();
-    router.replace("/(auth)/login");
+    // For now we just route to login, but we could pre-fill the type
+    router.replace({
+      pathname: "/(auth)/login",
+      params: { type },
+    } as any);
   };
 
   const handleNext = () => {
     if (currentSlideIndex < SLIDES.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentSlideIndex + 1 });
     } else {
-      finishOnboarding();
+      setShowRoleSelection(true);
     }
   };
 
   const handleSkip = () => {
-    finishOnboarding();
+    setShowRoleSelection(true);
   };
 
   const updateCurrentSlideIndex = (e: any) => {
@@ -93,6 +99,54 @@ export default function OnboardingScreen() {
     const currentIndex = Math.round(contentOffsetX / width);
     setCurrentSlideIndex(currentIndex);
   };
+
+  if (showRoleSelection) {
+    return (
+      <View style={styles.container}>
+        <Image
+          source={require("@/assets/images/clay_cleaner.png")}
+          style={[StyleSheet.absoluteFill, { opacity: 0.1 }]}
+          contentFit="cover"
+        />
+        <View style={styles.roleContent}>
+          <Text style={styles.roleTitle}>How will you use Hygi?</Text>
+          <Text style={styles.roleSubtitle}>
+            Select your profile type to continue.
+          </Text>
+
+          <TouchableOpacity
+            style={styles.roleCard}
+            onPress={() => finishOnboarding("client")}
+          >
+            <View style={styles.roleIconBox}>
+              <Feather name="search" size={24} color={Colors.primary} />
+            </View>
+            <View>
+              <Text style={styles.roleCardTitle}>I'm a Customer</Text>
+              <Text style={styles.roleCardText}>
+                I want to find a professional.
+              </Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.roleCard, { marginTop: 20 }]}
+            onPress={() => finishOnboarding("professional")}
+          >
+            <View style={styles.roleIconBox}>
+              <Feather name="briefcase" size={24} color={Colors.primary} />
+            </View>
+            <View>
+              <Text style={styles.roleCardTitle}>I'm a Professional</Text>
+              <Text style={styles.roleCardText}>
+                I want to provide services.
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -149,9 +203,60 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: Colors.background,
+  },
+  roleContent: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 30,
+  },
+  roleTitle: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: Colors.textPrimary,
+    marginBottom: 12,
+  },
+  roleSubtitle: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    marginBottom: 40,
+  },
+  roleCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.white,
+    padding: 24,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  roleIconBox: {
+    width: 52,
+    height: 52,
+    borderRadius: 16,
+    backgroundColor: "#FFF0F3",
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 20,
+  },
+  roleCardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: Colors.textPrimary,
+    marginBottom: 4,
+  },
+  roleCardText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
+    // ... remaining styles truncated for brevity
     justifyContent: "space-between",
     pointerEvents: "box-none",
   },
