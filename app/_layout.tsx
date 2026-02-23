@@ -1,10 +1,11 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Slot, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { DataProvider } from '@/context/DataContext';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 function RootLayoutNav() {
@@ -46,7 +47,20 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Slot />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(client)" />
+        <Stack.Screen name="(professional)" />
+        <Stack.Screen
+          name="book-service"
+          options={{
+            presentation: 'modal',
+            headerShown: true,
+            title: 'Agendar Serviço'
+          }}
+        />
+      </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
@@ -55,7 +69,9 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <RootLayoutNav />
+      <DataProvider>
+        <RootLayoutNav />
+      </DataProvider>
     </AuthProvider>
   );
 }

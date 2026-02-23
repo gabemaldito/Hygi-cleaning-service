@@ -2,6 +2,7 @@ import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -27,9 +28,16 @@ export default function LoginScreen() {
   const [isPasswordVisible, setPasswordVisible] = useState(false);
 
   const handleLogin = () => {
-    // Tipically, the backend returns the user type.
-    // We'll default to 'client' for this demo since the UI doesn't ask anymore.
-    signIn("dummy-token", "client");
+    if (!email) {
+      Alert.alert("Erro", "Por favor, insira seu e-mail.");
+      return;
+    }
+    // Simulating user type based on email for testing purposes
+    // Use 'pro@test.com' to login as professional, anything else as client
+    const type = email.toLowerCase().includes('pro') ? 'professional' : 'client';
+
+    // Use the email as the token/ID
+    signIn(email, type);
   };
 
   const handleSocialLogin = (provider: string) => {
