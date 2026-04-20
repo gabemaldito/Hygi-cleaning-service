@@ -1,4 +1,6 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
+import { Ionicons } from '@expo/vector-icons';
 
 interface ServiceCardProps {
   name: string;
@@ -10,32 +12,54 @@ interface ServiceCardProps {
 
 export function ServiceCard({ name, category, price, rating, imageUrl }: ServiceCardProps) {
   return (
-    <TouchableOpacity className="flex-row bg-white p-4 m-2 rounded-2xl shadow-sm border border-gray-100">
-      {/* Imagem do Prestador */}
-      <Image 
-        source={{ uri: imageUrl }} 
-        className="w-20 h-20 rounded-xl bg-gray-200"
-      />
-
-      {/* Info à Direita */}
-      <div className="flex-1 ml-4 justify-between">
-        <div className="flex-row justify-between items-start">
-          <View>
-            <Text className="text-gray-900 font-bold text-lg">{name}</Text>
-            <Text className="text-gray-500 text-sm">{category}</Text>
-          </View>
-          <View className="flex-row items-center bg-green-50 px-2 py-1 rounded-full">
-            <Text className="text-green-700 font-bold text-xs">⭐ {rating}</Text>
-          </View>
-        </div>
-
-        <View className="flex-row justify-between items-end mt-2">
-          <Text className="text-blue-600 font-semibold text-base">
-            R$ {price.toFixed(2)}/h
-          </Text>
-          <Text className="text-gray-400 text-xs">Ver perfil</Text>
+    <TouchableOpacity 
+      activeOpacity={0.7}
+      className="flex-row bg-white p-4 mx-4 my-2 rounded-3xl shadow-lg shadow-black/5 border border-gray-50 items-center"
+    >
+      {/* Avatar Container */}
+      <View className="relative">
+        <Image 
+          source={{ uri: imageUrl }} 
+          className="w-20 h-20 rounded-2xl bg-gray-100"
+          contentFit="cover"
+          transition={500}
+        />
+        <View className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-sm">
+          <View className="bg-success w-3 h-3 rounded-full border-2 border-white" />
         </View>
-      </div>
+      </View>
+
+      {/* Content Info */}
+      <View className="flex-1 ml-4 justify-center">
+        <View className="flex-row justify-between items-start">
+          <View className="flex-1 mr-2">
+            <Text className="text-textPrimary font-bold text-lg leading-6" numberOfLines={1}>
+              {name}
+            </Text>
+            <View className="flex-row items-center mt-0.5">
+              <Text className="text-textSecondary text-xs font-medium">{category}</Text>
+              <View className="w-1 h-1 rounded-full bg-gray-300 mx-1.5" />
+              <View className="flex-row items-center">
+                <Ionicons name="star" size={12} color="#FFD700" />
+                <Text className="text-textPrimary font-bold text-xs ml-0.5">{rating}</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View className="flex-row justify-between items-center mt-3">
+          <View className="flex-row items-baseline">
+            <Text className="text-primary font-bold text-lg">R$ {price.toFixed(0)}</Text>
+            <Text className="text-textSecondary text-xs font-medium ml-1">/h</Text>
+          </View>
+          
+          <View className="bg-primary/10 px-3 py-1.5 rounded-full">
+            <Text className="text-primary font-bold text-[10px] uppercase tracking-wider">
+              Reservar
+            </Text>
+          </View>
+        </View>
+      </View>
     </TouchableOpacity>
   );
 }

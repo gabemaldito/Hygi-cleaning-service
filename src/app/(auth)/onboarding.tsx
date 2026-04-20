@@ -5,7 +5,6 @@ import React, { useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
-  StyleSheet,
   Text,
   TouchableOpacity,
   View,
@@ -13,9 +12,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "@/context/AuthContext";
-import Colors from "@/theme/colors";
-import { spacing } from "@/theme/spacing";
-import { typography } from "@/theme/typography";
 
 const { width, height } = Dimensions.get("window");
 
@@ -26,7 +22,7 @@ const SLIDES = [
     description:
       "Encontre os profissionais mais dedicados de Sacramento, prontos para brilhar sua casa.",
     image: require("@/assets/images/clay_cleaner.png"),
-    color: "#f7e3fdff", // Light sky blue
+    color: "#f7e3fd", 
   },
   {
     id: "2",
@@ -34,7 +30,7 @@ const SLIDES = [
     description:
       "Agende com facilidade e gerencie seu tempo. Nós cuidamos da faxina, você aproveita o dia.",
     image: require("@/assets/images/clay_calendar.png"),
-    color: "#FCE4EC", // Light pink
+    color: "#FCE4EC", 
   },
   {
     id: "3",
@@ -42,25 +38,25 @@ const SLIDES = [
     description:
       "Segurança máxima e perfis verificados. No Hygi, sua paz de espírito é nossa prioridade.",
     image: require("@/assets/images/glass_shield.png"),
-    color: "#E3F2FD", // Light green
+    color: "#E3F2FD", 
   },
 ];
 
 const Slide = ({ item }: { item: (typeof SLIDES)[0] }) => {
   return (
-    <View style={[styles.slide, { backgroundColor: item.color }]}>
-      <View style={styles.imageContainer}>
+    <View className="items-center justify-center" style={{ width, height, backgroundColor: item.color }}>
+      <View className="w-[80%] h-[80vw] justify-center items-center shadow-2xl shadow-black/10">
         <Image
           source={item.image}
-          style={styles.image}
+          className="w-full h-full"
           contentFit="contain"
           transition={1000}
         />
       </View>
 
-      <BlurView intensity={80} tint="light" style={styles.glassCard}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description}>{item.description}</Text>
+      <BlurView intensity={80} tint="light" className="w-[85%] p-8 rounded-[32px] mt-12 border border-white/40 overflow-hidden items-center">
+        <Text className="text-[28px] font-bold text-textPrimary text-center mb-4">{item.title}</Text>
+        <Text className="text-base text-textSecondary text-center leading-6">{item.description}</Text>
       </BlurView>
     </View>
   );
@@ -95,7 +91,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       <FlatList
         ref={flatListRef}
         onMomentumScrollEnd={updateCurrentSlideIndex}
@@ -107,34 +103,33 @@ export default function OnboardingScreen() {
         keyExtractor={(item) => item.id}
       />
 
-      <View style={styles.overlay}>
+      <View className="absolute inset-0 justify-between pointer-events-none">
         <SafeAreaView>
-          <View style={styles.header}>
-            <TouchableOpacity onPress={handleSkip}>
-              <Text style={styles.skipText}>Pular</Text>
+          <View className="px-8 pt-4 items-end">
+            <TouchableOpacity onPress={handleSkip} className="pointer-events-auto">
+              <Text className="text-textSecondary font-medium text-base bg-white px-4 py-2 rounded-full overflow-hidden">
+                Pular
+              </Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
 
-        <View style={styles.footer}>
-          <View style={styles.indicatorContainer}>
+        <View className="px-8 pb-16">
+          <View className="flex-row justify-center mb-12">
             {SLIDES.map((_, index) => (
               <View
                 key={index}
-                style={[
-                  styles.indicator,
-                  currentSlideIndex === index && styles.indicatorActive,
-                ]}
+                className={`h-2 mx-1 rounded-full ${currentSlideIndex === index ? 'bg-primary w-6' : 'bg-black/10 w-2'}`}
               />
             ))}
           </View>
 
           <TouchableOpacity
-            style={styles.button}
+            className="bg-primary h-14 rounded-full items-center justify-center shadow-lg shadow-primary pointer-events-auto"
             onPress={handleNext}
             activeOpacity={0.8}
           >
-            <Text style={styles.buttonText}>
+            <Text className="text-white text-base font-bold">
               {currentSlideIndex === SLIDES.length - 1
                 ? "Começar Agora"
                 : "Próximo"}
@@ -145,112 +140,3 @@ export default function OnboardingScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: "space-between",
-    pointerEvents: "box-none",
-  },
-  header: {
-    paddingHorizontal: spacing.l,
-    paddingTop: spacing.m,
-    alignItems: "flex-end",
-  },
-  skipText: {
-    color: Colors.textSecondary,
-    fontFamily: typography.family.medium,
-    fontSize: typography.size.m,
-    backgroundColor: "rgba(255,255,255,1)",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  slide: {
-    width,
-    height,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  imageContainer: {
-    width: width * 0.8,
-    height: width * 0.8,
-    justifyContent: "center",
-    alignItems: "center",
-    // Claymorphism shadow effect
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.1,
-    shadowRadius: 30,
-    elevation: 10,
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-  },
-  glassCard: {
-    width: width * 0.85,
-    padding: spacing.l,
-    borderRadius: 32,
-    marginTop: spacing.xl,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.4)",
-    overflow: "hidden",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: typography.family.bold,
-    color: Colors.textPrimary,
-    textAlign: "center",
-    marginBottom: spacing.m,
-  },
-  description: {
-    fontSize: typography.size.m,
-    fontFamily: typography.family.regular,
-    color: Colors.textSecondary,
-    textAlign: "center",
-    lineHeight: 24,
-  },
-  footer: {
-    paddingHorizontal: spacing.l,
-    paddingBottom: spacing.xl + spacing.m,
-  },
-  indicatorContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: spacing.xl,
-  },
-  indicator: {
-    height: 8,
-    width: 8,
-    backgroundColor: "rgba(0,0,0,0.1)",
-    marginHorizontal: 4,
-    borderRadius: 4,
-  },
-  indicatorActive: {
-    backgroundColor: Colors.primary,
-    width: 24,
-  },
-  button: {
-    backgroundColor: Colors.primary,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  buttonText: {
-    color: Colors.white,
-    fontSize: typography.size.m,
-    fontFamily: typography.family.bold,
-  },
-});

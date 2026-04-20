@@ -3,7 +3,7 @@ import { ActivityIndicator, View } from 'react-native';
 
 export default function Index() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
+    <View className="flex-1 justify-center items-center" style={{ backgroundColor: Colors.background }}>
       <ActivityIndicator size="large" color={Colors.primary} />
     </View>
   );

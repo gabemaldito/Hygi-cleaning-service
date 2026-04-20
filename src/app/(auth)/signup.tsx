@@ -7,39 +7,30 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { useAuth } from "@/context/AuthContext";
-import Colors from "@/theme/colors";
-import { spacing } from "@/theme/spacing";
-import { typography } from "@/theme/typography";
+import { FormInput } from "@/components/FormInput";
 
 export default function SignupScreen() {
   const router = useRouter();
-  const { signIn } = useAuth(); // In real app, we might use a dedicated signUp function
+  const { signIn } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState<"client" | "professional">("client");
 
-  // UX States
   const [isPasswordVisible, setPasswordVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSignup = async () => {
-    // Basic Validation
     if (!name || !email || !password) {
-      Alert.alert(
-        "Campos obrigatórios",
-        "Por favor, preencha todos os campos."
-      );
+      Alert.alert("Campos obrigatórios", "Por favor, preencha todos os campos.");
       return;
     }
 
@@ -50,13 +41,7 @@ export default function SignupScreen() {
 
     try {
       setIsSubmitting(true);
-
-      // Simulate API delay for UX
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      // In a real app, this would be:
-      // await authService.signUp({ name, email, password, type: userType })
-
       signIn("dummy-signup-token", userType);
     } catch (error) {
       Alert.alert("Erro", "Não foi possível criar a conta. Tente novamente.");
@@ -65,169 +50,101 @@ export default function SignupScreen() {
     }
   };
 
-  const handleLoginNav = () => {
-    router.push("/(auth)/login");
-  };
-
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView className="flex-1 bg-white">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.keyboardView}
+        className="flex-1"
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 24, paddingVertical: 32 }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.header}>
-            <Text style={styles.title}>Crie sua conta</Text>
-            <Text style={styles.subtitle}>
+          <View className="mb-8">
+            <Text className="text-3xl font-bold text-textPrimary mb-2">Crie sua conta</Text>
+            <Text className="text-base text-textSecondary leading-6">
               Junte-se ao Hygi para serviços de limpeza prêmio.
             </Text>
           </View>
 
           {/* User Type Selector */}
-          <View style={styles.typeSelectorContainer}>
+          <View className="flex-row mb-8 bg-surface p-1 rounded-2xl">
             <TouchableOpacity
-              style={[
-                styles.typeButton,
-                userType === "client" && styles.typeButtonActive,
-              ]}
+              className={`flex-1 py-3 items-center rounded-xl ${userType === "client" ? 'bg-white shadow-sm' : ''}`}
               onPress={() => setUserType("client")}
-              activeOpacity={0.8}
             >
-              <Text
-                style={[
-                  styles.typeButtonText,
-                  userType === "client" && styles.typeButtonTextActive,
-                ]}
-              >
+              <Text className={`text-sm font-medium ${userType === "client" ? 'text-primary font-bold' : 'text-textSecondary'}`}>
                 Cliente
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[
-                styles.typeButton,
-                userType === "professional" && styles.typeButtonActive,
-              ]}
+              className={`flex-1 py-3 items-center rounded-xl ${userType === "professional" ? 'bg-white shadow-sm' : ''}`}
               onPress={() => setUserType("professional")}
-              activeOpacity={0.8}
             >
-              <Text
-                style={[
-                  styles.typeButtonText,
-                  userType === "professional" && styles.typeButtonTextActive,
-                ]}
-              >
+              <Text className={`text-sm font-medium ${userType === "professional" ? 'text-primary font-bold' : 'text-textSecondary'}`}>
                 Profissional
               </Text>
             </TouchableOpacity>
           </View>
 
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Nome completo</Text>
-              <View style={styles.inputWrapper}>
-                <Ionicons
-                  name="person-outline"
-                  size={20}
-                  color={Colors.textSecondary}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Seu nome"
-                  placeholderTextColor={Colors.textSecondary}
-                  value={name}
-                  onChangeText={setName}
-                  autoCapitalize="words"
-                />
-              </View>
-            </View>
+          <View className="flex-1">
+            <FormInput
+              label="Nome completo"
+              icon="person-outline"
+              placeholder="Seu nome"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+            />
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>E-mail</Text>
-              <View style={styles.inputWrapper}>
-                <Ionicons
-                  name="mail-outline"
-                  size={20}
-                  color={Colors.textSecondary}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="seu@email.com"
-                  placeholderTextColor={Colors.textSecondary}
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-            </View>
+            <FormInput
+              label="E-mail"
+              icon="mail-outline"
+              placeholder="seu@email.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Senha</Text>
-              <View style={styles.inputWrapper}>
-                <Ionicons
-                  name="lock-closed-outline"
-                  size={20}
-                  color={Colors.textSecondary}
-                  style={styles.inputIcon}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Sua senha segura"
-                  placeholderTextColor={Colors.textSecondary}
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!isPasswordVisible}
-                />
-                <TouchableOpacity
-                  onPress={() => setPasswordVisible(!isPasswordVisible)}
-                >
-                  <Ionicons
-                    name={isPasswordVisible ? "eye-outline" : "eye-off-outline"}
-                    size={20}
-                    color={Colors.textSecondary}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+            <FormInput
+              label="Senha"
+              icon="lock-closed-outline"
+              placeholder="Sua senha segura"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!isPasswordVisible}
+              rightIcon={isPasswordVisible ? "eye-outline" : "eye-off-outline"}
+              onRightIconPress={() => setPasswordVisible(!isPasswordVisible)}
+            />
 
-            {/* Terms Disclaimer - Critical for Rover/Airbnb style trust */}
-            <Text style={styles.termsText}>
+            <Text className="text-xs text-textSecondary text-center my-4 leading-5">
               Ao selecionar &quot;Criar Conta&quot;, você concorda com os{" "}
-              <Text style={styles.termsLink}>Termos de Serviço</Text> e{" "}
-              <Text style={styles.termsLink}>Política de Privacidade</Text> do
-              Hygi.
+              <Text className="text-primary font-medium underline">Termos de Serviço</Text> e{" "}
+              <Text className="text-primary font-medium underline">Política de Privacidade</Text> do Hygi.
             </Text>
 
             <TouchableOpacity
-              style={[
-                styles.submitButton,
-                isSubmitting && styles.submitButtonDisabled,
-              ]}
+              className={`bg-primary rounded-full h-14 justify-center items-center mt-2 shadow-lg shadow-primary ${isSubmitting ? 'opacity-70' : ''}`}
               onPress={handleSignup}
-              activeOpacity={0.8}
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <ActivityIndicator color={Colors.white} />
+                <ActivityIndicator color="white" />
               ) : (
-                <Text style={styles.submitButtonText}>Criar Conta</Text>
+                <Text className="text-white font-bold text-base">Criar Conta</Text>
               )}
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.linkButton}
-              onPress={handleLoginNav}
+              className="mt-8 items-center py-2"
+              onPress={() => router.push("/(auth)/login")}
             >
-              <Text style={styles.linkText}>
+              <Text className="text-textSecondary text-sm">
                 Já tem uma conta?{" "}
-                <Text style={styles.linkTextBold}>Entrar</Text>
+                <Text className="text-primary font-bold">Entrar</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -236,148 +153,3 @@ export default function SignupScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-  keyboardView: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: spacing.l,
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.xl,
-  },
-  header: {
-    marginBottom: spacing.l,
-  },
-  title: {
-    fontSize: typography.size.xxl,
-    fontFamily: typography.family.bold,
-    color: Colors.textPrimary,
-    marginBottom: spacing.s,
-  },
-  subtitle: {
-    fontSize: typography.size.m,
-    fontFamily: typography.family.regular,
-    color: Colors.textSecondary,
-    lineHeight: typography.lineHeight.m,
-  },
-  typeSelectorContainer: {
-    flexDirection: "row",
-    marginBottom: spacing.l,
-    backgroundColor: Colors.surface,
-    padding: 4,
-    borderRadius: spacing.m,
-  },
-  typeButton: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: "center",
-    borderRadius: 12,
-  },
-  typeButtonActive: {
-    backgroundColor: Colors.white,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  typeButtonText: {
-    fontSize: typography.size.s,
-    fontFamily: typography.family.medium,
-    color: Colors.textSecondary,
-  },
-  typeButtonTextActive: {
-    color: Colors.primary,
-    fontFamily: typography.family.bold,
-  },
-  form: {
-    flex: 1,
-  },
-  inputContainer: {
-    marginBottom: spacing.m,
-  },
-  label: {
-    fontSize: typography.size.s,
-    fontFamily: typography.family.medium,
-    color: Colors.textPrimary,
-    marginBottom: 6,
-    marginLeft: 4,
-  },
-  inputWrapper: {
-    flexDirection: "row", // Added for icon + input + eye layout
-    alignItems: "center",
-    backgroundColor: Colors.surface,
-    borderRadius: spacing.m,
-    paddingHorizontal: spacing.m, // Reduced padding if relying on height, but standard is fine
-    height: 56, // Fixed height for consistency
-    borderWidth: 1,
-    borderColor: "transparent",
-  },
-  inputIcon: {
-    marginRight: spacing.s,
-  },
-  input: {
-    flex: 1,
-    fontSize: typography.size.m,
-    fontFamily: typography.family.regular,
-    color: Colors.textPrimary,
-    height: "100%", // Take full height of wrapper
-    padding: 0,
-  },
-  termsText: {
-    fontSize: typography.size.xs,
-    color: Colors.textSecondary,
-    textAlign: "center",
-    marginVertical: spacing.s,
-    lineHeight: 18,
-  },
-  termsLink: {
-    color: Colors.primary,
-    fontFamily: typography.family.medium,
-    textDecorationLine: "underline",
-  },
-  submitButton: {
-    backgroundColor: Colors.primary,
-    borderRadius: spacing.xl,
-    height: 56,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: spacing.s,
-    shadowColor: Colors.primary,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  submitButtonDisabled: {
-    opacity: 0.7,
-  },
-  submitButtonText: {
-    color: Colors.white,
-    fontFamily: typography.family.bold,
-    fontSize: typography.size.m,
-  },
-  linkButton: {
-    marginTop: spacing.l,
-    alignItems: "center",
-    paddingVertical: spacing.s,
-  },
-  linkText: {
-    color: Colors.textSecondary,
-    fontSize: typography.size.s,
-    fontFamily: typography.family.regular,
-  },
-  linkTextBold: {
-    color: Colors.primary,
-    fontFamily: typography.family.bold,
-  },
-});
